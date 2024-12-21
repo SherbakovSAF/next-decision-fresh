@@ -1,11 +1,11 @@
 import { User } from "@prisma/client";
 import prisma from "@/../prisma/prisma.client";
 import { Suspense } from "react";
-
+export const dynamic = "force-dynamic";
 export default async function Home() {
   let users: User[] = [];
   try {
-    users = await prisma.user.findMany();
+    users = await prisma.user.findMany({ orderBy: { id: "desc" } });
   } catch (error: unknown) {
     console.log(error);
     return <div>Ошибка</div>;
