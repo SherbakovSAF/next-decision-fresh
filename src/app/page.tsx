@@ -3,9 +3,12 @@ import prisma from "@/../prisma/prisma.client";
 import { Suspense } from "react";
 
 export default async function Home() {
-  const result = await prisma.user.findMany();
-
-  const users: User[] = result ?? [];
+  let users: User[] = [];
+  try {
+    users = await prisma.user.findMany();
+  } catch {
+    return <div>Ошибка</div>;
+  }
 
   return (
     <Suspense fallback={<div>Load</div>}>
