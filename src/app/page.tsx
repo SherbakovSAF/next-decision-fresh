@@ -6,7 +6,8 @@ export default async function Home() {
   let users: User[] = [];
   try {
     users = await prisma.user.findMany();
-  } catch {
+  } catch (error: unknown) {
+    console.log(error);
     return <div>Ошибка</div>;
   }
 
