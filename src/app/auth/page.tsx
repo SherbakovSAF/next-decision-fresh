@@ -8,10 +8,13 @@ const AuthPage: React.FC = () => {
   const handleLogin = async () => {
     try {
       // console.log(data);
-      const finedUser = await fetch("http://localhost:3000/api/login", {
-        method: "POST",
-        body: JSON.stringify({ login }),
-      });
+      const finedUser = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_PATH}/api/login`,
+        {
+          method: "POST",
+          body: JSON.stringify({ login }),
+        }
+      );
 
       if (finedUser) router.push("/");
 
@@ -46,10 +49,14 @@ const AuthPage: React.FC = () => {
   const handleRegister = async () => {
     try {
       // console.log(data);
-      const newUser = await fetch("http://localhost:3000/api/auth", {
-        method: "POST",
-        body: JSON.stringify({ login }),
-      });
+
+      const newUser = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_PATH}/api/auth`,
+        {
+          method: "POST",
+          body: JSON.stringify({ login }),
+        }
+      );
 
       if (newUser) router.push("/");
 

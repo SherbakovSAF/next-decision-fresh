@@ -5,9 +5,12 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   let users: User[] = [];
   try {
-    const finedUsers = await fetch("http://localhost:3000/api/user", {
-      method: "GET",
-    });
+    const finedUsers = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_PATH}/api/user`,
+      {
+        method: "GET",
+      }
+    );
 
     users = await finedUsers.json();
   } catch (error) {
