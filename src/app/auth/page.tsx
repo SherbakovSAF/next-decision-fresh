@@ -62,10 +62,6 @@ const AuthPage: React.FC = () => {
 
       // TODO: Вынести создание токена отдельно
 
-      // const newAccessToken = await createJWTToken(
-      //   { userId: finedUser.id },
-      //   "1hr"
-      // );
       // console.log("newAccessToken", newAccessToken);
       // const newRefreshToken = await createJWTToken(
       //   { message: "YourMom is so a big pig" },
