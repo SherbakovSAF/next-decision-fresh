@@ -1,5 +1,6 @@
 import { getCookieValue } from "@/lib/cookies-handler.lib";
 import { isValidToken } from "@/lib/jwt-tokens.lib";
+import { CookiesName } from "@/types/cookies-name.type";
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -39,7 +40,7 @@ export const AuthTokenMiddleware = async (
 
     const accessTokenFromServer = getCookieValue(
       responseFetch.headers.getSetCookie(),
-      "yourMom"
+      CookiesName.AccessToken
     );
 
     if (!accessTokenFromServer)
