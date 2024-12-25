@@ -21,7 +21,10 @@ export const AuthTokenMiddleware = async (
     // Делаем запрос на сервер, чтобы он обновил auth в cookies
 
     const responseFetch = await fetch(
-      new URL(`${process.env.NEXT_PUBLIC_URL_PATH}/api/refresh`, request.url),
+      new URL(
+        `${process.env.NEXT_PUBLIC_URL_PATH}/api/auth/refresh`,
+        request.url
+      ),
       {
         method: "GET", // Метод запроса
         headers: {
