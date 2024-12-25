@@ -2,7 +2,6 @@ import { CookiesName } from "@/types/cookies-name.type";
 import { createJWTToken } from "@/lib/jwt-tokens.lib";
 import prisma from "../../../../../prisma/prisma.client";
 import { NextRequest, NextResponse } from "next/server";
-import { error } from "console";
 
 export async function GET(request: NextRequest) {
   try {
