@@ -2,6 +2,7 @@ import { CookiesName } from "@/types/cookies-name.type";
 import { createJWTToken } from "@/lib/jwt-tokens.lib";
 import prisma from "../../../../../prisma/prisma.client";
 import { NextRequest, NextResponse } from "next/server";
+import { error } from "console";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,9 +12,11 @@ export async function GET(request: NextRequest) {
     if (!refreshToken) throw new Error("Cookie не найдены");
 
     // Проверяем наличие пользователя с этим refreshToken в базе данных
-    const user = await prisma.user_M.findFirst({ where: { refreshToken } });
+    const user = await prisma.user_M.findFirstOrThrow({
+      where: { refreshToken },
+    });
+
     console.log("user", user);
-    if (!user) throw new Error("RefreshToken некорректен");
 
     // Создаем новый accessToken
     const newAccessToken = await createJWTToken({ userId: user.id }, "1hr");
