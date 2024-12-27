@@ -14,27 +14,6 @@ datasource db {
   directUrl = env("DIRECT_URL") // uses a direct connection
 }
 
-// model Post {
-//   id        String  @id @default(cuid())
-//   title     String
-//   content   String?
-//   published Boolean @default(false)
-//   author    User?   @relation(fields: [authorId], references: [id])
-//   authorId  String?
-// }
-
-// model User {
-//   id           String   @id @default(cuid())
-//   name         String?
-//   email        String?  @unique
-//   createdAt    DateTime @default(now()) @map(name: "created_at")
-//   updatedAt    DateTime @updatedAt @map(name: "updated_at")
-//   posts        Post[]
-//   refreshToken String?  @default("")
-
-//   @@map(name: "users")
-// }
-
 model User_M {
   id           Int     @id @default(autoincrement())
   login        String  @unique
@@ -47,8 +26,45 @@ model User_M {
   // doubt           Doubt_M[]
   // doubtReaction_M DoubtReaction_M[]
 
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Doubt_M         Doubt_M[]
+  DoubtReaction_M DoubtReaction_M[]
+
+  @@map(name: "users")
+}
+
+model Doubt_M {
+  id             Int               @id @default(autoincrement())
+  title          String            @default("")
+  dateFinish     DateTime
+  userId         Int
+  user           User_M            @relation(fields: [userId], references: [id])
+  doubtReactions DoubtReaction_M[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map(name: "users")
+  @@map(name: "doubts")
+}
+
+enum DoubtReaction_E {
+  GOOD
+  BAD
+  NORMAL
+}
+
+model DoubtReaction_M {
+  id          Int             @id @default(autoincrement())
+  emotionText String          @default("")
+  type        DoubtReaction_E @default(NORMAL)
+  doubtId     Int
+  doubt       Doubt_M         @relation(fields: [doubtId], references: [id])
+  userId      Int
+  user        User_M          @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map(name: "doubt_reaction")
 }

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/navigation";
 // import { User_M } from "@prisma/client";
 // import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,8 +23,7 @@ const schema = yup
   .required();
 
 const AuthPage: React.FC = () => {
-  // const [login, setLogin] = useState("");
-  // const router = useRouter();
+  const router = useRouter();
 
   const {
     register,
@@ -65,6 +65,8 @@ const AuthPage: React.FC = () => {
         }
       );
 
+      if (finedUser) router.push("/");
+
       console.log(finedUser);
     } finally {
       setLoadingRequest(false);
@@ -92,7 +94,7 @@ const AuthPage: React.FC = () => {
           }),
         }
       );
-      console.log(finedUser);
+      if (finedUser) router.push("/");
       // TODO: Перенести в service
     } finally {
       setLoadingRequest(false);
