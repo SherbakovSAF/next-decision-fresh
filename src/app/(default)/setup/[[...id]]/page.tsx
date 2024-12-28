@@ -26,7 +26,7 @@ const SetupPage: React.FC<SetupPageProps> = async ({ params }) => {
 
     const cookieStore = await cookies();
     const rawDoubt = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt/${id}?id=${id}`,
+      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt?id=${id}`,
       {
         method: "GET",
         headers: new Headers({ Cookie: cookieStore.toString() }),
