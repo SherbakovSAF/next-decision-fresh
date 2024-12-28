@@ -1,5 +1,5 @@
 import { CookiesName } from "@/types/cookies-name.type";
-import { createJWTToken } from "@/lib/jwt-tokens.lib";
+import { createJWTToken, isValidToken } from "@/lib/jwt-tokens.lib";
 import prisma from "../../../../../prisma/prisma.client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,19 +7,17 @@ export async function GET(request: NextRequest) {
   try {
     // Получаем refreshToken из куки запроса
     const refreshToken = request.cookies.get(CookiesName.RefreshToken)?.value;
-    console.log("refreshToken", refreshToken);
-    if (!refreshToken) throw new Error("Cookie не найдены");
 
+    if (!refreshToken) throw new Error("Cookie не найдены");
+    if (!isValidToken(refreshToken)) throw new Error("Токен устарел");
     // Проверяем наличие пользователя с этим refreshToken в базе данных
     const user = await prisma.user_M.findFirstOrThrow({
       where: { refreshToken },
     });
 
-    console.log("user", user);
-
     // Создаем новый accessToken
     const newAccessToken = await createJWTToken({ userId: user.id }, "1hr");
-    console.log("newAccessToken", newAccessToken);
+
     // Создаем ответ
     const response = NextResponse.json({ success: true }, { status: 200 });
 
@@ -31,7 +29,7 @@ export async function GET(request: NextRequest) {
       path: "/", // Делает cookie доступными на всем сайте
       maxAge: 3600, // Время жизни cookie (1 час)
     });
-    console.log("response", response);
+
     // response.cookies.set(CookiesName.AccessToken, newAccessToken, {
     //   httpOnly: true,
     //   secure: process.env.NODE_ENV === "production", // Включать только для HTTPS в продакшн-режиме

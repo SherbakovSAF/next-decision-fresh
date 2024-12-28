@@ -7,18 +7,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useRouter, usePathname, redirect } from "next/navigation";
-import Icon from "../ui/icon";
-import { callApi } from "@/services/base.service";
 import { RoutePath_E } from "@/types/route-path.type";
 import Link from "next/link";
+import { redirect, usePathname, useRouter } from "next/navigation";
+import Icon from "../ui/icon";
 
 function HeaderBlock() {
   const router = useRouter();
   const pathname = usePathname();
 
   const logout = async () => {
-    await callApi("DELETE", "auth/logout");
+    await fetch(`${process.env.NEXT_PUBLIC_URL_PATH}/api/auth/logout`, {
+      method: "DELETE",
+    });
     redirect(RoutePath_E.AUTH);
   };
   return (

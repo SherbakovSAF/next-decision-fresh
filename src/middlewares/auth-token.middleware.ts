@@ -11,8 +11,12 @@ export const AuthTokenMiddleware = async (
 
   try {
     const accessToken = request.cookies.get("yourMom")?.value;
-    console.log(await isValidToken(accessToken ?? ""));
-    if (await isValidToken(accessToken ?? "")) return response;
+
+    if (await isValidToken(accessToken ?? "")) {
+      return response;
+    } else {
+      throw new Error("Токен невалиден");
+    }
   } catch {
     const refreshToken = request.cookies.get("yourDad")?.value;
     if (!refreshToken)
@@ -36,8 +40,6 @@ export const AuthTokenMiddleware = async (
       }
     );
 
-    console.log("fetch", responseFetch.headers);
-
     const accessTokenFromServer = getCookieValue(
       responseFetch.headers.getSetCookie(),
       CookiesName.AccessToken
@@ -47,7 +49,6 @@ export const AuthTokenMiddleware = async (
       throw new Error("Bad Request, но на самом деле нет токена");
     response.cookies.set("yourMom", accessTokenFromServer);
 
-    console.log("fetch res", response);
     return response;
   }
 };

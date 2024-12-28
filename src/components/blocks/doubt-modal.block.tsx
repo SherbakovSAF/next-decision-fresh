@@ -39,22 +39,19 @@ const DoubtModal: React.FC<Props> = ({
   const [isViewModal, setViewModal] = useToggle(isViewModalValue);
   useLockBodyScroll(isViewModalValue);
 
-  const callReactionById = useCallback(
-    (id: number) => {
-      try {
-        setLoadingReaction(true);
-        console.log("Вызов реакции", id);
-        if (reaction) setReaction(reaction);
-      } finally {
-        setLoadingReaction(false);
-      }
-    },
-    [reaction]
-  );
+  const callReactionById = useCallback(() => {
+    try {
+      setLoadingReaction(true);
+
+      if (reaction) setReaction(reaction);
+    } finally {
+      setLoadingReaction(false);
+    }
+  }, [reaction]);
 
   useEffect(() => {
     if (isViewModal && reactionId) {
-      callReactionById(reactionId);
+      callReactionById();
     }
   }, [isViewModal, reactionId, callReactionById]);
 

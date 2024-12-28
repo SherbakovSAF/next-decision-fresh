@@ -8,20 +8,6 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 export const dynamic = "force-dynamic";
 export default async function Home() {
-  // let users: User[] = [];
-  // try {
-  //   const finedUsers = await fetch(
-  //     `${process.env.NEXT_PUBLIC_URL_PATH}/api/user`,
-  //     {
-  //       method: "GET",
-  //     }
-  //   );
-
-  //   users = await finedUsers.json();
-  // } catch (error) {
-  //   console.log(error);
-  //   return <div>Ошибка</div>;
-  // }
   let doubts: Doubt_I[] = [];
   try {
     const cookieStore = await cookies();

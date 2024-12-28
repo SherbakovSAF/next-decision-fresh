@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const data: User_M = await request.json();
-    console.log(data);
+
     const newUser = await prisma.user_M.create({
       data: {
         login: data.login,

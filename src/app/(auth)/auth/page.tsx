@@ -66,8 +66,6 @@ const AuthPage: React.FC = () => {
       );
 
       if (finedUser) router.push("/");
-
-      console.log(finedUser);
     } finally {
       setLoadingRequest(false);
     }

@@ -8,8 +8,6 @@ export async function GET(request: NextRequest) {
     const doubtId = request.nextUrl.searchParams.get("doubtId");
     const time = request.nextUrl.searchParams.get("time");
 
-    // TODO: Поставить проверку на userid
-
     if (!doubtId || !time) throw new Error();
     const startOfDay = new Date(new Date(Number(time)).setHours(0, 0, 0, 0));
     const endOfDay = new Date(new Date(Number(time)).setHours(23, 59, 59, 999));
@@ -17,7 +15,7 @@ export async function GET(request: NextRequest) {
     const data = await prisma.doubtReaction_M.findMany({
       where: {
         doubtId: Number(doubtId),
-        createdAt: { gte: startOfDay, lt: endOfDay },
+        createdAt: { gte: startOfDay, lte: endOfDay },
         userId: await getUserIdByAccessTokenFromRequest(request),
       },
     });
@@ -39,6 +37,7 @@ export async function POST(request: NextRequest) {
         doubtId: data.doubtId,
       },
     });
+
     return NextResponse.json(newReaction);
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 500 });

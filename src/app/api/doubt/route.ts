@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    console.log(request.cookies);
     const data = await prisma.doubt_M.findMany({
       where: {
         dateFinish: { gt: new Date() },

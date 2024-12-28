@@ -33,6 +33,9 @@ export default function RootLayout({
           "relative container max-w-screen-lg h-dvh antialiased"
         )}
       >
+        <div className="text-xs fixed top-0 left-0 text-gray opacity-75">
+          <span>ALFA-1.0.0</span>
+        </div>
         {children}
       </body>
     </html>
