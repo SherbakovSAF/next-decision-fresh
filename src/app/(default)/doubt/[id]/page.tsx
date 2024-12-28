@@ -35,7 +35,7 @@ const DoubtPage: React.FC<DoubtPageProps> = async ({ params }) => {
 
     // const doubt = await getDoubtService(Number(id));
     const rawDoubt = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt/${id}?id=${id}`,
+      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt?id=${id}`,
       {
         method: "GET",
         headers: new Headers({ Cookie: cookieStore.toString() }),

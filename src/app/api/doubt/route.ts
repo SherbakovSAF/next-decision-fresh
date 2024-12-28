@@ -6,7 +6,31 @@ import { Doubt_M } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/handlerError.lib";
 
-export async function GET(request: NextRequest) {
+const getOneDoubt = async (id: number, request: NextRequest) => {
+  try {
+    if (!id) throw new Error("Нет ID");
+    const data = await prisma.doubt_M.findFirstOrThrow({
+      where: {
+        id: Number(id),
+        userId: await getUserIdByAccessTokenFromRequest(request),
+      },
+      include: {
+        doubtReactions: true,
+      },
+    });
+
+    const reactions = data.doubtReactions.map((reaction) => reaction.type);
+
+    return NextResponse.json({
+      ...data,
+      averageReaction: calculateAverageReactions(reactions),
+    });
+  } catch (error) {
+    return NextResponse.json(handleError("BAD_REQUEST", error));
+  }
+};
+
+const getAllDoubt = async (request: NextRequest) => {
   try {
     const data = await prisma.doubt_M.findMany({
       where: {
@@ -28,6 +52,15 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     // console.log("server", error);
     return NextResponse.json(handleError("BAD_REQUEST", error));
+  }
+};
+
+export async function GET(request: NextRequest) {
+  const id = request.nextUrl.searchParams.get("id");
+  if (id) {
+    return getOneDoubt(Number(id), request);
+  } else {
+    return getAllDoubt(request);
   }
 }
 
