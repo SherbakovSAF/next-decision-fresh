@@ -4,9 +4,12 @@ import prisma from "../../../../../prisma/prisma.client";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/handlerError.lib";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const id = request.nextUrl.searchParams.get("id");
+    const { id } = params;
     console.log(request);
     if (!id) throw new Error("Нет ID");
     const data = await prisma.doubt_M.findFirstOrThrow({
