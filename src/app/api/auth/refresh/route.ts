@@ -2,6 +2,7 @@ import { CookiesName } from "@/types/cookies-name.type";
 import { createJWTToken, isValidToken } from "@/lib/jwt-tokens.lib";
 import prisma from "../../../../../prisma/prisma.client";
 import { NextRequest, NextResponse } from "next/server";
+import { handleError } from "@/lib/handlerError.lib";
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,9 +41,6 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(
-      { error: error || "Ошибка сервера" },
-      { status: 500 }
-    );
+    return NextResponse.json(handleError("BAD_REQUEST", error));
   }
 }

@@ -4,6 +4,7 @@ import { getUserIdByAccessTokenFromRequest } from "@/lib/cookies-handler.lib";
 import prisma from "../../../../prisma/prisma.client";
 import { Doubt_M } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { handleError } from "@/lib/handlerError.lib";
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     // console.log("server", error);
-    return NextResponse.json({ error: error }, { status: 500 });
+    return NextResponse.json(handleError("BAD_REQUEST", error));
   }
 }
 
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newData);
   } catch (error) {
-    return NextResponse.json({ error: error }, { status: 500 });
+    return NextResponse.json(handleError("BAD_REQUEST", error));
   }
 }
 
@@ -60,6 +61,6 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(updatedDoubt);
   } catch (error) {
-    return NextResponse.json({ error: error }, { status: 500 });
+    return NextResponse.json(handleError("BAD_REQUEST", error));
   }
 }
