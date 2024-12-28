@@ -20,11 +20,14 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({ success: true }, { status: 200 });
 
-    const newAccessToken = await createJWTToken({ userId: finedUser.id }, "1h");
+    const newAccessToken = await createJWTToken(
+      { userId: finedUser.id },
+      "1hr"
+    );
 
     const newRefreshToken = await createJWTToken(
       { message: "YourMom is so a big pig" },
-      "7d"
+      "7day"
     );
 
     response.cookies.set(CookiesName.AccessToken, newAccessToken);
