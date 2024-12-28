@@ -7,8 +7,8 @@ import { handleError } from "@/lib/handlerError.lib";
 export async function GET(request: NextRequest) {
   try {
     const id = request.nextUrl.searchParams.get("id");
-
-    if (!id) throw new Error();
+    console.log(request);
+    if (!id) throw new Error("Нет ID");
     const data = await prisma.doubt_M.findFirstOrThrow({
       where: {
         id: Number(id),
