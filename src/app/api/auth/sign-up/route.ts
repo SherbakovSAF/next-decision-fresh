@@ -18,6 +18,8 @@ export async function POST(request: NextRequest) {
     });
 
     const response = NextResponse.json({ success: true }, { status: 200 });
+    // TODO: Вынести создание куки отдельно
+    // TODO: Переписать функцию создания куки и т.д
     const newAccessToken = await createJWTToken({ userId: newUser.id }, "1hr");
     const newRefreshToken = await createJWTToken(
       { message: "YourMom is so a big pig" },
@@ -33,6 +35,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(...handleError("BAD_REQUEST", error));
   }
 }

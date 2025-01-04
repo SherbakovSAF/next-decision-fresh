@@ -1,5 +1,6 @@
 import { getCookieValue } from "@/lib/cookies-handler.lib";
 import { isValidToken } from "@/lib/jwt-tokens.lib";
+import { callApiFetch } from "@/services/base.service";
 import { CookiesName } from "@/types/cookies-name.type";
 
 import { NextRequest, NextResponse } from "next/server";
@@ -25,21 +26,9 @@ export const AuthTokenMiddleware = async (
     // TODO: Добавить в пути
     // Делаем запрос на сервер, чтобы он обновил auth в cookies
 
-    const responseFetch = await fetch(
-      new URL(
-        `${process.env.NEXT_PUBLIC_URL_PATH}/api/auth/refresh`,
-        request.url
-      ),
-      {
-        method: "GET", // Метод запроса
-        headers: {
-          "Content-Type": "application/json", // Тип контента
-          Cookie: request.cookies.toString() || "", // Передача куков
-        },
-        credentials: "same-origin", // Передача куков на клиент-сервер
-      }
-    );
+    const responseFetch = await callApiFetch("GET", "/auth/refresh");
 
+    console.log(responseFetch);
     const accessTokenFromServer = getCookieValue(
       responseFetch.headers.getSetCookie(),
       CookiesName.AccessToken

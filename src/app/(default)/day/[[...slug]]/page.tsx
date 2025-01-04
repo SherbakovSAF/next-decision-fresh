@@ -1,14 +1,11 @@
 import CardDoubtReactionBlock from "@/components/blocks/card-doubt-reaction.block";
 import MasonryGrid from "@/components/blocks/masonry-grid.block";
-// import { DoubtReaction_M, DoubtReaction_E } from "@prisma/client";
-// import { useState } from "react";
-// import { getReactionService } from "@/services/reaction.service";
+import { getOneReactionService } from "@/services/reaction.service";
+
 import { RoutePath_E } from "@/types/route-path.type";
 import { DoubtReaction_M } from "@prisma/client";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-// import { RoutePath_E } from "../types/route-path.type";
-// import { getReactionService } from "../services/reactiom.service";
+
 interface DayPageProps {
   params: Promise<{
     slug: string[];
@@ -16,7 +13,6 @@ interface DayPageProps {
 }
 
 const DayPage: React.FC<DayPageProps> = async ({ params }) => {
-  // const searchParams = useSearchParams();
   const slug = (await params).slug;
   const doubtId = slug[0];
 
@@ -24,6 +20,7 @@ const DayPage: React.FC<DayPageProps> = async ({ params }) => {
 
   if (!doubtId || !time || !Number(doubtId) || !Number(time))
     redirect(RoutePath_E.HOME);
+  // TODO: Очень странно достаются параметры, может найти другой способ
   // TODO: Блокировать завтрашние дни в календаре, но при этом оставлять те, которые были выбраны ранее
   // TODO: К всем этим параметрам и прочему добавить нормальную логику, чтобы человек понимал что и почему передаётся
   // TODO: Продумать получение doubt, но не во всех реакциях
@@ -34,19 +31,10 @@ const DayPage: React.FC<DayPageProps> = async ({ params }) => {
 
   let reactionsForDay: DoubtReaction_M[] = [];
   try {
-    const cookieStore = await cookies();
-    const rawDoubt = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_URL_PATH
-      }/api/reaction/?doubtId=${doubtId}&time=${new Date(
-        Number(time)
-      ).getTime()}`,
-      {
-        method: "GET",
-        headers: new Headers({ Cookie: cookieStore.toString() }),
-      }
+    reactionsForDay = await getOneReactionService(
+      Number(doubtId),
+      new Date(Number(time)).getTime()
     );
-    reactionsForDay = await rawDoubt.json();
   } catch {
     return <div>Не удалось получить данные на день</div>;
   }

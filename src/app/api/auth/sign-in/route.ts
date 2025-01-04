@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
     });
 
     // TODO: Вынести создание токена отдельно
-
+    // TODO: Вынести создание куки отдельно
+    // TODO: Переписать функцию создания куки и т.д
     const response = NextResponse.json({ success: true }, { status: 200 });
 
     const newAccessToken = await createJWTToken(
@@ -41,6 +42,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(...handleError("BAD_REQUEST", error));
   }
 }

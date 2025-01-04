@@ -1,13 +1,12 @@
 import { getUnixTime } from "date-fns";
 
 import * as jose from "jose";
-
+// TODO Переписать все
 export const isValidToken = async (token: string) => {
   try {
     const resultToken = await verifyJWTToken(token);
-    console.log(resultToken);
+
     if (!resultToken?.exp) throw new Error("Ошибка");
-    console.log(resultToken.exp, getUnixTime(new Date()));
 
     return resultToken.exp >= getUnixTime(new Date());
   } catch {

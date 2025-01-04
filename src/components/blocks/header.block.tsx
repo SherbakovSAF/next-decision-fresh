@@ -11,17 +11,15 @@ import { RoutePath_E } from "@/types/route-path.type";
 import Link from "next/link";
 import { redirect, usePathname, useRouter } from "next/navigation";
 import Icon from "../ui/icon";
+import { signOutService } from "@/services/auth.service";
 
 function HeaderBlock() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const logout = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_URL_PATH}/api/auth/logout`, {
-      method: "DELETE",
-    });
-    redirect(RoutePath_E.AUTH);
-  };
+  const logout = async () =>
+    signOutService().then(() => redirect(RoutePath_E.AUTH));
+
   return (
     <header className="flex justify-between items-center py-6">
       <div

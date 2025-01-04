@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import { Jost } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 const jost = Jost({ subsets: ["latin"] });
 
 export default function RootLayout({
@@ -37,6 +38,7 @@ export default function RootLayout({
           <span>ALFA-1.0.0</span>
         </div>
         {children}
+        <Toaster position="top-center" />
       </body>
     </html>
   );

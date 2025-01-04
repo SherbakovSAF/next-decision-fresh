@@ -1,19 +1,19 @@
-import { CookiesName } from "@/types/cookies-name.type";
+// import { CookiesName } from "@/types/cookies-name.type";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-interface BaseParamsApi_I<T> {
-  method: HttpMethod;
-  url: string;
-  data?: T | null;
-  params?: { [key: string]: string | number } | null;
-  customConfig?: AxiosRequestConfig | null;
-}
+// interface BaseParamsApi_I {
+//   method: HttpMethod;
+//   url: string;
+//   data?: unknown | null;
+//   params?: { [key: string]: string | number } | null;
+//   customConfig?: AxiosRequestConfig | null;
+// }
 
 const isServer = typeof window === "undefined";
 
-const baseConfigAxios = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+const baseConfig = {
+  baseURL: `${process.env.NEXT_PUBLIC_URL_PATH}/api`,
   timeout: 10000,
   withCredentials: true,
   headers: {
@@ -21,27 +21,13 @@ const baseConfigAxios = {
   },
 };
 
-const defaultApi: AxiosInstance = axios.create(baseConfigAxios);
-const detailApi: AxiosInstance = axios.create(baseConfigAxios);
+const defaultApi: AxiosInstance = axios.create(baseConfig);
 
 defaultApi.interceptors.request.use(
   async (config) => {
     if (isServer) {
-      const { cookies } = await import("next/headers"),
-        token = (await cookies()).get(CookiesName.AccessToken)?.value;
-
-      if (token) {
-        config.headers["Authorization"] = `Bearer ${token}`;
-      }
-    } else {
-      const token = document.cookie.replace(
-        /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      );
-
-      if (token) {
-        config.headers["Authorization"] = `Bearer ${token}`;
-      }
+      const { cookies } = await import("next/headers");
+      config.headers.set("Cookie", (await cookies()).toString());
     }
     return config;
   },
@@ -50,48 +36,82 @@ defaultApi.interceptors.request.use(
 
 defaultApi.interceptors.response.use(
   (response: AxiosResponse) => response.data,
-  (error) => Promise.reject(error)
+  // TODO: Возможно стоит убрать .response.data, но ведь там есть константы и default ошибки, поэтому надо удедиться
+  (error) => Promise.reject(error.response.data.constError)
 );
 
-detailApi.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error)
-);
-
-detailApi.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  (error) => Promise.reject(error)
-);
-
-const getConfigForRequest = <T>({
-  method,
-  url,
-  data = null,
-  params = null,
-  customConfig = null,
-}: BaseParamsApi_I<T>) => {
+export const callApi = async <T>(
+  method: HttpMethod,
+  url: string,
+  data?: unknown | null,
+  params?: { [key: string]: string | number } | null,
+  customConfig?: AxiosRequestConfig | null
+): Promise<T> => {
   let config: AxiosRequestConfig = { method, url };
 
   if (data) config = { ...config, data };
   if (params) config = { ...config, params };
   if (customConfig) config = { ...config, ...customConfig };
-  return config;
+
+  return defaultApi(config);
 };
 
-export const callApi = <T>(
+// TODO: Провести рефакторинг функции. Т.к она написана с помощью ИИ
+export const callApiFetch = async (
   method: HttpMethod,
   url: string,
-  data?: T | null,
+  data?: unknown | null,
   params?: { [key: string]: string | number } | null,
-  customConfig?: AxiosRequestConfig | null
-): Promise<T> =>
-  defaultApi(getConfigForRequest({ url, data, params, customConfig, method }));
+  customHeaders?: HeadersInit | null
+): Promise<Response> => {
+  const queryString = params
+    ? "?" +
+      new URLSearchParams(
+        Object.entries(params).reduce((acc, [key, value]) => {
+          acc[key] = value.toString();
+          return acc;
+        }, {} as Record<string, string>)
+      ).toString()
+    : "";
 
-export const callDetailsApi = <T>(
-  method: HttpMethod,
-  url: string,
-  data?: T | null,
-  params?: { [key: string]: string | number } | null,
-  customConfig?: AxiosRequestConfig | null
-): Promise<AxiosResponse> =>
-  detailApi(getConfigForRequest({ url, data, params, customConfig, method }));
+  const fullUrl = `${baseConfig.baseURL}${url}${queryString}`;
+
+  const headers: HeadersInit = {
+    ...baseConfig.headers,
+    ...customHeaders,
+  };
+
+  // Добавление серверных cookies (если выполняется на сервере)
+  if (isServer) {
+    const { cookies } = await import("next/headers");
+    const cookieHeader = (await cookies()).toString();
+    if (cookieHeader)
+      (headers as Record<string, string>)["Cookie"] = cookieHeader;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), baseConfig.timeout);
+
+  try {
+    const response = await fetch(fullUrl, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    // Обработка ошибок HTTP
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData.constError || response.statusText;
+    }
+
+    // Парсинг ответа
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error; // Передача ошибки дальше
+  }
+};

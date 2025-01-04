@@ -1,26 +1,15 @@
-// import { User } from "@prisma/client";
-
 import CardDoubtBlock from "@/components/blocks/card-doubt.block";
 import ButtonBottom from "@/components/elements/button-bottom.element";
+import { getAllDoubtService } from "@/services/doubt.service";
 import { Doubt_I } from "@/types/doubt.type";
 import Link from "next/dist/client/link";
-import { cookies } from "next/headers";
 import { Suspense } from "react";
 export const dynamic = "force-dynamic";
 export default async function Home() {
   let doubts: Doubt_I[] = [];
+
   try {
-    const cookieStore = await cookies();
-
-    const requestDoubts = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt`,
-      {
-        method: "GET",
-        headers: new Headers({ Cookie: cookieStore.toString() }),
-      }
-    );
-
-    doubts = await requestDoubts.json();
+    doubts = await getAllDoubtService();
   } catch {
     return "Ошибка. Не удалось получить сомнения";
   }

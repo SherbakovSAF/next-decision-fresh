@@ -11,6 +11,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  createDoubtService,
+  updateDoubtService,
+} from "@/services/doubt.service";
 // import {
 //   createDoubtService,
 //   updateDoubtService,
@@ -103,30 +107,6 @@ const SetupPageContent: React.FC<{ initialDoubt: Doubt_M }> = ({
     router.push(RoutePath_E.HOME);
   };
 
-  // TODO: Временные сервисы
-
-  const updateDoubtService = async (doubt: Doubt_M) => {
-    const rawDoubt = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt`,
-      {
-        method: "PUT",
-        body: JSON.stringify({ ...doubt }),
-      }
-    );
-
-    return rawDoubt.json();
-  };
-  const createDoubtService = async (doubt: Doubt_M) => {
-    const rawDoubt = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt`,
-      {
-        method: "POST",
-        body: JSON.stringify({ ...doubt }),
-      }
-    );
-
-    return rawDoubt.json();
-  };
   return (
     <>
       <LabelBlock htmlFor="doubtTitle" value="В чём твоё сомнение">

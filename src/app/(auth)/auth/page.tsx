@@ -1,26 +1,22 @@
 "use client";
+
 import LabelBlock from "@/components/blocks/label.block";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
+import { LoginSchema, PasswordSchema } from "@/lib/yup-schemas.lib";
+import { signInService, signUpService } from "@/services/auth.service";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
-// import { User_M } from "@prisma/client";
-// import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
 type FormData = yup.InferType<typeof schema>;
-const schema = yup
-  .object({
-    login: yup
-      .string()
-      .required("Поле обязательное")
-      .min(3, "Минимум 3 символа"),
-    password: yup.string().required().min(6),
-  })
-  .required();
+const schema = yup.object({
+  login: LoginSchema,
+  password: PasswordSchema,
+});
 
 const AuthPage: React.FC = () => {
   const router = useRouter();
@@ -40,60 +36,32 @@ const AuthPage: React.FC = () => {
 
   const [isLoadingRequest, setLoadingRequest] = useState<boolean>(false);
 
-  const handleLogin = async (event: FormData) => {
+  const handleSignIn = async (event: FormData) => {
     try {
       setLoadingRequest(true);
-      // TODO: Перенести в service
-      // TODO: ПЕреписать на singin sing out
-      // TODO: ЛУчше сделать отдельное DTO для auth
 
-      const finedUser = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_PATH}/api/auth/login`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            id: 0,
-            login: event.login,
-            password: event.password,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            isVerifyMail: false,
-            fullName: "",
-            refreshToken: "",
-            mail: event.login,
-          }),
-        }
-      );
+      const finedUser = await signInService({
+        login: event.login,
+        password: event.password,
+      });
 
       if (finedUser) router.push("/");
     } finally {
       setLoadingRequest(false);
     }
   };
-  const handleRegister = async (event: FormData) => {
+  const handleSignUp = async (event: FormData) => {
     try {
       setLoadingRequest(true);
-      const finedUser = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_PATH}/api/auth/register`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            id: 0,
-            login: event.login,
-            password: event.password,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            isVerifyMail: false,
-            fullName: "",
-            refreshToken: "",
-            mail: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.login ?? "")
-              ? event.login
-              : "",
-          }),
-        }
-      );
+      const finedUser = await signUpService({
+        login: event.login,
+        password: event.password,
+        mail: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.login ?? "")
+          ? event.login
+          : "",
+      });
+
       if (finedUser) router.push("/");
-      // TODO: Перенести в service
     } finally {
       setLoadingRequest(false);
     }
@@ -130,23 +98,12 @@ const AuthPage: React.FC = () => {
         ) : (
           <>
             {" "}
-            <Button onClick={handleSubmit(handleRegister)}>Создать</Button>
-            <Button onClick={handleSubmit(handleLogin)}>Войти</Button>
+            <Button onClick={handleSubmit(handleSignUp)}>Создать</Button>
+            <Button onClick={handleSubmit(handleSignIn)}>Войти</Button>
           </>
         )}
       </div>
     </div>
-    // <div className="flex flex-col gap-4">
-    //   <input
-    //     type="text"
-    //     placeholder="mail"
-    //     value={login}
-    //     onChange={(event) => setLogin(event.target.value)}
-    //   />
-    //   {/* <input type="text" placeholder="pass" /> */}
-    //   <button onClick={() => handleRegister()}>Создать</button>
-    //   <button onClick={() => handleLogin()}>Войти</button>
-    // </div>
   );
 };
 

@@ -9,6 +9,7 @@ import ColorCardElement from "@/components/elements/color-card.element";
 import { Button } from "../ui/button";
 import Icon from "../ui/icon";
 import { Textarea } from "../ui/textarea";
+import { createReactionService } from "@/services/reaction.service";
 
 interface Props {
   isViewModalValue: true;
@@ -86,10 +87,7 @@ const DoubtModal: React.FC<Props> = ({
       if (!!reaction.id) {
         console.log("update");
       } else {
-        fetch(`${process.env.NEXT_PUBLIC_URL_PATH}/api/reaction`, {
-          method: "POST",
-          body: JSON.stringify({ ...reaction }),
-        });
+        createReactionService(reaction);
       }
     } finally {
       handleCloseModal(event);

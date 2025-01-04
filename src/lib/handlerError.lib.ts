@@ -1,24 +1,25 @@
 type ERROR_CONSTANTS = "NOT_FOUND" | "BAD_REQUEST";
 
-type ResponseErrorHandler_T<T> = {
-  constError: ERROR_CONSTANTS;
-  defaultError: T;
-  status: number;
-};
+type ResponseErrorHandler_T<T> = [
+  { constError: ERROR_CONSTANTS; defaultError: T },
+  { status: number }
+];
 
+// Функция формирует массив для деструктуризации в NextResponse
+// Основная задача функции отобразить CONST ошибки, для центрального определения проблемы
 export const handleError = <T>(
   constError: ERROR_CONSTANTS,
   defaultError: T
 ): ResponseErrorHandler_T<T> => {
-  console.error(`Error: ${defaultError}. Const: ${constError}`);
-
+  let status = 500;
   switch (constError) {
-    case "NOT_FOUND":
-      return { constError, defaultError, status: 404 };
     case "BAD_REQUEST":
-      return { constError, defaultError, status: 500 };
-
+      status = 500;
+      break;
     default:
-      return { constError, defaultError, status: 404 };
+      status = 404;
+      break;
   }
+
+  return [{ constError, defaultError }, { status }];
 };

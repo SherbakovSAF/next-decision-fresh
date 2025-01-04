@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { verifyJWTToken } from "./jwt-tokens.lib";
 
+// TODO Переписать все
 export const getUserIdByAccessTokenFromRequest = async (
   request: NextRequest
 ): Promise<number> => {

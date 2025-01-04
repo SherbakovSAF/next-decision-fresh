@@ -26,7 +26,7 @@ const getOneDoubt = async (id: number, request: NextRequest) => {
       averageReaction: calculateAverageReactions(reactions),
     });
   } catch (error) {
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(...handleError("BAD_REQUEST", error));
   }
 };
 
@@ -51,7 +51,7 @@ const getAllDoubt = async (request: NextRequest) => {
     );
   } catch (error) {
     // console.log("server", error);
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(...handleError("BAD_REQUEST", error));
   }
 };
 
@@ -94,6 +94,6 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(updatedDoubt);
   } catch (error) {
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(...handleError("BAD_REQUEST", error));
   }
 }

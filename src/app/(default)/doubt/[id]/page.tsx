@@ -1,13 +1,12 @@
 import ColorCardElement from "@/components/elements/color-card.element";
-import { redirect } from "next/navigation";
-// import { getDoubtService } from "@/services/doubt.service";
-import { RoutePath_E } from "@/types/route-path.type";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
-import Link from "next/link";
-import DoubtCalendarClient from "./(components)/doubt-calendar-client";
+import { getOneDoubtService } from "@/services/doubt.service";
 import { Doubt_I } from "@/types/doubt.type";
-import { cookies } from "next/headers";
+import { RoutePath_E } from "@/types/route-path.type";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import DoubtCalendarClient from "./(components)/doubt-calendar-client";
 
 interface DoubtPageProps {
   params: Promise<{ id: string }>;
@@ -28,21 +27,12 @@ const DoubtPage: React.FC<DoubtPageProps> = async ({ params }) => {
         return defaultValue;
     }
   };
+
   try {
     const id = (await params).id;
-    if (!id) redirect(RoutePath_E.HOME);
-    const cookieStore = await cookies();
+    if (!id || !Number(id)) redirect(RoutePath_E.HOME);
 
-    // const doubt = await getDoubtService(Number(id));
-    const rawDoubt = await fetch(
-      `${process.env.NEXT_PUBLIC_URL_PATH}/api/doubt?id=${id}`,
-      {
-        method: "GET",
-        headers: new Headers({ Cookie: cookieStore.toString() }),
-      }
-    );
-
-    doubt = await rawDoubt.json();
+    doubt = await getOneDoubtService(Number(id));
     if (!doubt) redirect(RoutePath_E.HOME);
   } catch {
     return "Ошибка. Не удалось получить сомнения";
