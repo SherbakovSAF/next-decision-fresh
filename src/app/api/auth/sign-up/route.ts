@@ -4,6 +4,7 @@ import { CookiesName } from "@/types/cookies-name.type";
 import { User_M } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/handlerError.lib";
+import { genPass } from "@/lib/hash-password.lib";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
     const newUser = await prisma.user_M.create({
       data: {
         login: data.login,
-        password: data.password,
+        password: await genPass(data.password),
         mail: data.mail ?? "",
       },
     });

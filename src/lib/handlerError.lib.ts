@@ -9,8 +9,8 @@ type ResponseErrorHandler_T<T> = [
 // Основная задача функции отобразить CONST ошибки, для центрального определения проблемы
 export const handleError = <T>(
   constError: ERROR_CONSTANTS,
-  defaultError: T
-): ResponseErrorHandler_T<T> => {
+  defaultError: T | null = null
+): ResponseErrorHandler_T<T | null> => {
   let status = 500;
   switch (constError) {
     case "BAD_REQUEST":

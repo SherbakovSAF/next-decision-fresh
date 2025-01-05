@@ -5,6 +5,7 @@ import prisma from "../../../../../prisma/prisma.client";
 import { User_M } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/handlerError.lib";
+import { verifyPass } from "@/lib/hash-password.lib";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,10 +14,11 @@ export async function POST(request: NextRequest) {
     const finedUser = await prisma.user_M.findFirstOrThrow({
       where: {
         OR: [{ login: data.login }, { mail: data.login }],
-        password: data.password,
       },
     });
 
+    if (!(await verifyPass(data.password, finedUser.password)))
+      return NextResponse.json(...handleError("NOT_FOUND"));
     // TODO: Вынести создание токена отдельно
     // TODO: Вынести создание куки отдельно
     // TODO: Переписать функцию создания куки и т.д
