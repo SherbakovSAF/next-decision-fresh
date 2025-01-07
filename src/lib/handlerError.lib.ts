@@ -1,25 +1,67 @@
-type ERROR_CONSTANTS = "NOT_FOUND" | "BAD_REQUEST";
+export type ErrorConstants_T =
+  | "NOT_FOUND"
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "OK"
+  | "CREATED";
 
-type ResponseErrorHandler_T<T> = [
-  { constError: ERROR_CONSTANTS; defaultError: T },
-  { status: number }
-];
+export class HandleError<T = unknown> {
+  private constError: ErrorConstants_T;
+  private defaultError?: T;
+  private status: number;
 
-// Функция формирует массив для деструктуризации в NextResponse
-// Основная задача функции отобразить CONST ошибки, для центрального определения проблемы
-export const handleError = <T>(
-  constError: ERROR_CONSTANTS,
-  defaultError: T | null = null
-): ResponseErrorHandler_T<T | null> => {
-  let status = 500;
-  switch (constError) {
-    case "BAD_REQUEST":
-      status = 500;
-      break;
-    default:
-      status = 404;
-      break;
+  private statusMap(constError: ErrorConstants_T): number {
+    switch (constError) {
+      case "OK":
+        return 200;
+      case "CREATED":
+        return 201;
+      case "UNAUTHORIZED":
+        return 401;
+      case "FORBIDDEN":
+        return 403;
+      case "NOT_FOUND":
+        return 404;
+
+      default:
+        return 500;
+    }
   }
 
-  return [{ constError, defaultError }, { status }];
-};
+  constructor(constError: ErrorConstants_T, defaultError?: T) {
+    this.constError = constError;
+    this.defaultError = defaultError;
+    this.status = this.statusMap(constError);
+  }
+
+  private getObject() {
+    return {
+      constError: this.constError,
+      defaultError: this.defaultError,
+      status: this.status,
+    };
+  }
+
+  private getArrayForResponse() {
+    return [
+      { constError: this.constError, defaultError: this.defaultError },
+      { status: this.status },
+    ];
+  }
+
+  public static const(constError: ErrorConstants_T) {
+    return constError;
+  }
+
+  public static object(constError: ErrorConstants_T) {
+    return new HandleError(constError).getObject();
+  }
+
+  public static nextResponse<T = unknown>(
+    constError: ErrorConstants_T,
+    defaultError?: T
+  ) {
+    return new HandleError(constError, defaultError).getArrayForResponse();
+  }
+}

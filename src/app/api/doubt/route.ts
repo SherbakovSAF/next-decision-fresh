@@ -1,10 +1,10 @@
 import { calculateAverageReactions } from "@/hooks/calculateAverageReactions.hook";
 import { Doubt_I } from "@/types/doubt.type";
-import { getUserIdByAccessTokenFromRequest } from "@/lib/cookies-handler.lib";
+import { getUserIdFromRequest } from "@/lib/cookies-handler.lib";
 import prisma from "../../../../prisma/prisma.client";
 import { Doubt_M } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { handleError } from "@/lib/handlerError.lib";
+import { HandleError } from "@/lib/handlerError.lib";
 
 const getOneDoubt = async (id: number, request: NextRequest) => {
   try {
@@ -12,7 +12,7 @@ const getOneDoubt = async (id: number, request: NextRequest) => {
     const data = await prisma.doubt_M.findFirstOrThrow({
       where: {
         id: Number(id),
-        userId: await getUserIdByAccessTokenFromRequest(request),
+        userId: await getUserIdFromRequest(request),
       },
       include: {
         doubtReactions: true,
@@ -26,7 +26,7 @@ const getOneDoubt = async (id: number, request: NextRequest) => {
       averageReaction: calculateAverageReactions(reactions),
     });
   } catch (error) {
-    return NextResponse.json(...handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 };
 
@@ -35,7 +35,7 @@ const getAllDoubt = async (request: NextRequest) => {
     const data = await prisma.doubt_M.findMany({
       where: {
         dateFinish: { gt: new Date() },
-        userId: await getUserIdByAccessTokenFromRequest(request),
+        userId: await getUserIdFromRequest(request),
       },
       include: { doubtReactions: true },
     });
@@ -51,7 +51,7 @@ const getAllDoubt = async (request: NextRequest) => {
     );
   } catch (error) {
     // console.log("server", error);
-    return NextResponse.json(...handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 };
 
@@ -72,13 +72,13 @@ export async function POST(request: NextRequest) {
       data: {
         title: data.title,
         dateFinish: data.dateFinish,
-        userId: await getUserIdByAccessTokenFromRequest(request),
+        userId: await getUserIdFromRequest(request),
       },
     });
 
     return NextResponse.json(newData);
   } catch (error) {
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 }
 
@@ -86,7 +86,7 @@ export async function PUT(request: NextRequest) {
   // Добавить проверку на userid
   try {
     const { id, title, dateFinish, userId }: Doubt_M = await request.json();
-    if (userId !== (await getUserIdByAccessTokenFromRequest(request)))
+    if (userId !== (await getUserIdFromRequest(request)))
       throw new Error("Вы пытаес");
     const updatedDoubt = await prisma.doubt_M.update({
       where: { id },
@@ -94,6 +94,6 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(updatedDoubt);
   } catch (error) {
-    return NextResponse.json(...handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 }

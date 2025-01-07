@@ -1,8 +1,10 @@
-import { getUserIdByAccessTokenFromRequest } from "@/lib/cookies-handler.lib";
+import { getUserIdFromRequest } from "@/lib/cookies-handler.lib";
 import prisma from "../../../../prisma/prisma.client";
 import { DoubtReaction_M } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { handleError } from "@/lib/handlerError.lib";
+import { HandleError } from "@/lib/handlerError.lib";
+import { calculateAverageReactions } from "@/hooks/calculateAverageReactions.hook";
+import { ReactionCreateDTO } from "@/types/reaction.types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,13 +19,13 @@ export async function GET(request: NextRequest) {
       where: {
         doubtId: Number(doubtId),
         createdAt: { gte: startOfDay, lte: endOfDay },
-        userId: await getUserIdByAccessTokenFromRequest(request),
+        userId: await getUserIdFromRequest(request),
       },
     });
 
-    return NextResponse.json(data);
+    return NextResponse.json<DoubtReaction_M[]>(data);
   } catch (error) {
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 }
 
@@ -34,13 +36,25 @@ export async function POST(request: NextRequest) {
       data: {
         emotionText: data.emotionText,
         type: data.type,
-        userId: await getUserIdByAccessTokenFromRequest(request),
+        userId: await getUserIdFromRequest(request),
         doubtId: data.doubtId,
       },
     });
 
-    return NextResponse.json(newReaction);
+    const allReaction = await prisma.doubt_M.findFirstOrThrow({
+      where: { id: newReaction.doubtId },
+      select: { doubtReactions: { select: { type: true } } },
+    });
+
+    const updatedDoubt: ReactionCreateDTO["updatedDoubt"] = {
+      id: newReaction.doubtId,
+      averageReaction: calculateAverageReactions(
+        allReaction.doubtReactions.map((reaction) => reaction.type)
+      ),
+    };
+
+    return NextResponse.json<ReactionCreateDTO>({ newReaction, updatedDoubt });
   } catch (error) {
-    return NextResponse.json(handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 }

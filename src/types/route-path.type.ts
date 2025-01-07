@@ -6,4 +6,5 @@ export enum RoutePath_E {
   AUTH = "/auth",
   AUTH_LOGIN = "/auth/login",
   AUTH_REGISTER = "/auth/register",
+  NOT_FOUND = "/not-found",
 }

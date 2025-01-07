@@ -1,59 +1,31 @@
-import { getUnixTime } from "date-fns";
-
 import * as jose from "jose";
-// TODO Переписать все
-export const isValidToken = async (token: string) => {
-  try {
-    const resultToken = await verifyJWTToken(token);
+import { HandleError } from "./handlerError.lib";
 
-    if (!resultToken?.exp) throw new Error("Ошибка");
-
-    return resultToken.exp >= getUnixTime(new Date());
-  } catch {
-    throw new Error("Ошибка валидации");
-  }
-};
-
-// Create and Read JWT Tokens
 export const createJWTToken = async (
   payload: Record<string, unknown>,
   exp = "1h"
 ): Promise<string> => {
   try {
-    const secretKey = process.env.JWT_SECRET_KEY;
-    if (!secretKey) {
-      throw new Error(
-        "JWT_SECRET_KEY is not defined in environment variables."
-      );
-    }
+    const secret = jose.base64url.decode(process.env.JWT_SECRET_KEY!);
 
-    const secret = new TextEncoder().encode(secretKey);
-
-    const token = await new jose.SignJWT(payload)
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt()
+    return new jose.EncryptJWT(payload)
+      .setProtectedHeader({ alg: "dir", enc: "A128CBC-HS256" })
       .setExpirationTime(exp)
-      .sign(secret);
-
-    return token;
-  } catch {
-    throw new Error("Ошибка создания");
+      .encrypt(secret);
+  } catch (error) {
+    throw new Error(HandleError.const("BAD_REQUEST"), { cause: error });
   }
 };
 
-export const verifyJWTToken = async (token: string) => {
-  const secretKey = process.env.JWT_SECRET_KEY;
-  if (!secretKey) {
-    throw new Error("JWT_SECRET_KEY is not defined in environment variables.");
-  }
-
+// При истечении срока действия будет срабатывать catch
+export const getPayloadJWTToken = async (
+  token: string
+): Promise<jose.JWTPayload | null> => {
   try {
-    const { payload } = await jose.jwtVerify(
-      token,
-      new TextEncoder().encode(secretKey)
-    );
+    const secret = jose.base64url.decode(process.env.JWT_SECRET_KEY!);
+    const { payload } = await jose.jwtDecrypt(token, secret);
     return payload;
   } catch {
-    throw new Error("Ошибка верификации");
+    return null;
   }
 };

@@ -81,13 +81,15 @@ const DoubtModal: React.FC<Props> = ({
       : "";
   };
 
-  const saveReaction = (event: React.MouseEvent) => {
+  const saveReaction = async (event: React.MouseEvent) => {
     try {
       setLoadingReactionRequest(true);
       if (!!reaction.id) {
         console.log("update");
       } else {
-        createReactionService(reaction);
+        const a = await createReactionService(reaction);
+        console.log(a);
+        // TODO: При преносе в жустан сделать обновление реакции
       }
     } finally {
       handleCloseModal(event);

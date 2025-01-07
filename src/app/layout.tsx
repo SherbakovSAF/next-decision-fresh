@@ -1,10 +1,10 @@
-import "../styles/globals.css";
-import { Jost } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Jost } from "next/font/google";
 import { Toaster } from "sonner";
+import "../styles/globals.css";
 const jost = Jost({ subsets: ["latin"] });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

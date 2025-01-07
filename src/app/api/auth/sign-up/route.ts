@@ -1,10 +1,12 @@
-import { createJWTToken } from "@/lib/jwt-tokens.lib";
-import prisma from "../../../../../prisma/prisma.client";
-import { CookiesName } from "@/types/cookies-name.type";
+import {
+  createAccessTokenCookie,
+  createRefreshTokenCookie,
+} from "@/lib/cookies-handler.lib";
+import { HandleError } from "@/lib/handlerError.lib";
+import { genPass } from "@/lib/hash-password.lib";
 import { User_M } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { handleError } from "@/lib/handlerError.lib";
-import { genPass } from "@/lib/hash-password.lib";
+import prisma from "../../../../../prisma/prisma.client";
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,17 +20,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const response = NextResponse.json({ success: true }, { status: 200 });
-    // TODO: Вынести создание куки отдельно
-    // TODO: Переписать функцию создания куки и т.д
-    const newAccessToken = await createJWTToken({ userId: newUser.id }, "1hr");
-    const newRefreshToken = await createJWTToken(
-      { message: "YourMom is so a big pig" },
-      "7day"
-    );
-    response.cookies.set(CookiesName.AccessToken, newAccessToken);
-
-    response.cookies.set(CookiesName.RefreshToken, newRefreshToken);
+    const response = NextResponse.json(HandleError.nextResponse("CREATED"));
+    await createAccessTokenCookie(response, newUser.id);
+    const newRefreshToken = await createRefreshTokenCookie(response);
     await prisma.user_M.update({
       where: { id: newUser.id },
       data: { refreshToken: newRefreshToken },
@@ -36,6 +30,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(...handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 }

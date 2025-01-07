@@ -1,6 +1,6 @@
 import CardDoubtReactionBlock from "@/components/blocks/card-doubt-reaction.block";
 import MasonryGrid from "@/components/blocks/masonry-grid.block";
-import { getOneReactionService } from "@/services/reaction.service";
+import { getReactionsByDoubtIdAndDateService } from "@/services/reaction.service";
 
 import { RoutePath_E } from "@/types/route-path.type";
 import { DoubtReaction_M } from "@prisma/client";
@@ -30,8 +30,9 @@ const DayPage: React.FC<DayPageProps> = async ({ params }) => {
   // TODO: Добавить пагицию на все запросы
 
   let reactionsForDay: DoubtReaction_M[] = [];
+
   try {
-    reactionsForDay = await getOneReactionService(
+    reactionsForDay = await getReactionsByDoubtIdAndDateService(
       Number(doubtId),
       new Date(Number(time)).getTime()
     );
@@ -39,7 +40,6 @@ const DayPage: React.FC<DayPageProps> = async ({ params }) => {
     return <div>Не удалось получить данные на день</div>;
   }
 
-  // const [isViewDoubtModal, setViewDoubtModal] = useState(false);
   return (
     <div className="pb-20">
       <div className="mb-8">

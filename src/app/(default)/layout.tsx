@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import HeaderBlock from "@/components/blocks/header.block";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Decision App",

@@ -2,28 +2,28 @@ import { CookiesName } from "@/types/cookies-name.type";
 import prisma from "../../../../../prisma/prisma.client";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getUserIdByAccessTokenFromRequest } from "@/lib/cookies-handler.lib";
-import { handleError } from "@/lib/handlerError.lib";
+import { getUserIdFromRequest } from "@/lib/cookies-handler.lib";
+import { HandleError } from "@/lib/handlerError.lib";
 
 export async function DELETE(request: NextRequest) {
   try {
     const cookiesStore = await cookies();
 
-    const userIdByAccessToken = await getUserIdByAccessTokenFromRequest(
-      request
-    );
+    const userIdByAccessToken = await getUserIdFromRequest(request);
 
     if (!userIdByAccessToken)
-      return NextResponse.json({ success: true }, { status: 500 });
+      return NextResponse.json(HandleError.const("NOT_FOUND"));
+
     await prisma.user_M.update({
       where: { id: userIdByAccessToken },
       data: { refreshToken: null },
     });
+
     cookiesStore.delete(CookiesName.AccessToken);
     cookiesStore.delete(CookiesName.RefreshToken);
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json(HandleError.const("OK"));
   } catch (error) {
-    return NextResponse.json(...handleError("BAD_REQUEST", error));
+    return NextResponse.json(HandleError.nextResponse("BAD_REQUEST", error));
   }
 }

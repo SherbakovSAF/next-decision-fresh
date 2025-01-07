@@ -1,12 +1,13 @@
 import { toast } from "sonner";
 import { callApi } from "./base.service";
 import { DoubtReaction_M } from "@prisma/client";
+import { ReactionCreateDTO } from "@/types/reaction.types";
 
 export const createReactionService = async (
   reaction: DoubtReaction_M
-): Promise<DoubtReaction_M> => {
+): Promise<ReactionCreateDTO> => {
   try {
-    const createReaction = callApi<DoubtReaction_M>(
+    const createReaction = callApi<ReactionCreateDTO>(
       "POST",
       "reaction",
       reaction
@@ -20,12 +21,15 @@ export const createReactionService = async (
   }
 };
 
-export const getOneReactionService = async (
+export const getReactionsByDoubtIdAndDateService = async (
   doubtId: number,
   time: number
 ): Promise<DoubtReaction_M[]> => {
   try {
-    return callApi<DoubtReaction_M[]>("GET", "doubt", null, { doubtId, time });
+    return callApi<DoubtReaction_M[]>("GET", "reaction", null, {
+      doubtId,
+      time,
+    });
   } catch {
     // TODO: Позже можем достать из константы ответ и записать в descriptin\
     toast.error("Не удалось реакции на день");
