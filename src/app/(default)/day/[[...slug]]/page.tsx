@@ -40,11 +40,16 @@ const DayPage: React.FC<DayPageProps> = async ({ params }) => {
     return <div>Не удалось получить данные на день</div>;
   }
 
+  if (!reactionsForDay.length)
+    return <div>Вы не оставляли реакции на день</div>;
+
   return (
     <div className="pb-20">
       <div className="mb-8">
-        <strong>{new Date(Number(time)).getDate()} числа</strong> на Ваш вопрос
-        у Вас были такие реакции
+        <strong>
+          {new Date(reactionsForDay[0].createdAt).getDate()} числа
+        </strong>{" "}
+        на Ваш вопрос у Вас были такие реакции
       </div>
 
       <MasonryGrid columnNumber={2} elements={reactionsForDay} gap={4}>

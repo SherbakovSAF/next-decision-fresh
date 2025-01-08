@@ -1,13 +1,12 @@
 "use client";
 
-import { ChevronsRight } from "lucide-react";
 import ColorCardElement from "@/components/elements/color-card.element";
-import { differenceInDays } from "date-fns";
-import { useMemo, useState } from "react";
+import { ReactionModalControl } from "@/components/modals/reaction.modal";
 import { Doubt_I } from "@/types/doubt.type";
-import DoubtModal from "@/components/blocks/doubt-modal.block";
+import { differenceInDays } from "date-fns";
+import { ChevronsRight } from "lucide-react";
+import { useMemo } from "react";
 import { Button } from "../ui/button";
-
 interface CardDoubtBlockProps {
   doubt: Doubt_I;
 }
@@ -17,12 +16,14 @@ const CardDoubtBlock: React.FC<CardDoubtBlockProps> = ({ doubt }) => {
     () => Math.abs(differenceInDays(new Date(), doubt.dateFinish)),
     [doubt.dateFinish]
   );
-  const [isViewDoubtModal, setViewDoubtModal] = useState(false);
+  // const [isViewDoubtModal, setViewDoubtModal] = useState(false);
 
   const handleOpenModal = (event: React.MouseEvent) => {
     event.preventDefault();
 
-    setViewDoubtModal(true);
+    ReactionModalControl.open(doubt);
+
+    // setViewDoubtModal(true);
   };
   return (
     <div className="bg-primary-foreground py-3 px-2  rounded-lg flex flex-col gap-3">
@@ -51,13 +52,13 @@ const CardDoubtBlock: React.FC<CardDoubtBlockProps> = ({ doubt }) => {
       >
         Реакция
       </Button>
-      {isViewDoubtModal && (
+      {/* {isViewDoubtModal && (
         <DoubtModal
           doubt={doubt}
           isViewModalValue={isViewDoubtModal}
           onCloseModal={() => setViewDoubtModal(false)}
         />
-      )}
+      )} */}
     </div>
   );
 };

@@ -10,10 +10,12 @@ export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get(CookiesName.AccessToken)?.value;
   const token = await getPayloadJWTToken(accessToken ?? "");
 
-  // Если токен есть и мы идёт на auth, то возвращаем NotFound, где есть страница на главную
-  if (token && request.nextUrl.pathname.startsWith(RoutePath_E.AUTH)) {
-    return NextResponse.redirect(new URL(RoutePath_E.NOT_FOUND, request.url));
-  }
+  if (token && request.nextUrl.pathname.startsWith(RoutePath_E.AUTH))
+    return NextResponse.rewrite(new URL(RoutePath_E.NOT_FOUND, request.url));
+  console.log("Прошли проверку токена и начала");
+  // Доп проверка, чтобы избежать множества переадресаций
+  if (request.nextUrl.pathname.startsWith(RoutePath_E.AUTH))
+    return NextResponse.next();
 
   // Если просто есть токен и идёт на не Auth, то добро пожаловать
   if (token) return NextResponse.next();
@@ -21,6 +23,7 @@ export const middleware = async (request: NextRequest) => {
   // Если же токена нет, то смотрим, есть ли refresh
   const refreshToken = request.cookies.get(CookiesName.RefreshToken)?.value;
   // Refresh нет - будь добр авторизуйся
+
   if (!refreshToken)
     return NextResponse.redirect(new URL(RoutePath_E.AUTH, request.url));
 
@@ -44,5 +47,5 @@ export const middleware = async (request: NextRequest) => {
 };
 
 export const config: MiddlewareConfig = {
-  matcher: ["/"],
+  matcher: ["/", "/auth", "/settings"],
 };

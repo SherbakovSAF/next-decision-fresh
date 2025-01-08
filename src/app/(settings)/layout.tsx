@@ -20,7 +20,7 @@ export default function SettingsLayout({
           <Button>На главную</Button>
         </Link>
       </header>
-      <main className="flex justify-center items-center ">{children}</main>
+      <main>{children}</main>
     </div>
   );
 }

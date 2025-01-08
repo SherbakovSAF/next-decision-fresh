@@ -12,10 +12,21 @@ import Link from "next/link";
 import { redirect, usePathname, useRouter } from "next/navigation";
 import Icon from "../ui/icon";
 import { signOutService } from "@/services/auth.service";
+import { UserMinDTO_I } from "@/types/user.types";
+import { useUserStore } from "@/stores/user.store";
+import { useEffect } from "react";
+import { getUserName } from "@/lib/parse-date.lib";
 
-function HeaderBlock() {
+interface HeaderBlockProps {
+  initialUser: UserMinDTO_I;
+}
+
+const HeaderBlock: React.FC<HeaderBlockProps> = ({ initialUser }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { user, setUser } = useUserStore();
+
+  useEffect(() => setUser(initialUser), [initialUser, setUser]);
 
   const logout = async () =>
     signOutService().then(() => redirect(RoutePath_E.AUTH));
@@ -29,7 +40,7 @@ function HeaderBlock() {
         {/* TODO: Когда задеплою глянуть норм ли переходит */}
         {pathname !== "/" && <Icon name="ArrowBigLeft" />}
         <h1>
-          Привет, <span>Сергей</span>
+          Привет, <span>{getUserName(user)}</span>
         </h1>
       </div>
 
@@ -68,6 +79,6 @@ function HeaderBlock() {
       </div>
     </header>
   );
-}
+};
 
 export default HeaderBlock;

@@ -1,24 +1,38 @@
-const SettingsPage = () => {
+import { getCurrentUserService } from "@/services/user.service";
+import { UserMinDTO_I } from "@/types/user.types";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import SettingsClient from "./(settings-content-client)/settings-client";
+
+const SettingsPage = async () => {
+  let user: UserMinDTO_I | null = null;
+
+  try {
+    user = await getCurrentUserService();
+  } catch {
+    redirect("/");
+  }
+
   return (
-    <div className="flex flex-col justify-center items-center">
-      <h1 className="text-2xl">Раздел в разработке</h1>
-      <p>Что Вы сможете тут изменить?</p>
-      <small>Если я не заброшу проект</small>
-      <ul className="list-disc ml-4">
-        <li> Поменять язык</li>
-        <li>Подтвердить почту</li>
-        <li>Поменять пароль</li>
-        <li>Привязать соц сети(Пока что телеграмм для оповещений)</li>
-        <li>
-          Закинуть мне денег.{" "}
-          <small>
-            Не потому что я меркантильный, а потому что надо протестить
-            подключение оплаты
-          </small>
-        </li>
-      </ul>
-    </div>
+    <Suspense fallback={<div>Грузим твои данные</div>}>
+      <SettingsClient initialUser={user} />
+    </Suspense>
   );
 };
 
 export default SettingsPage;
+{
+  /* <li> Поменять язык</li> */
+}
+{
+  /* <li>Привязать соц сети(Пока что телеграмм для оповещений)</li> */
+}
+{
+  /*  Закинуть мне денег.{" "} */
+}
+{
+  /* Поменять пароль */
+}
+{
+  /* ПОдтвердить почту */
+}
