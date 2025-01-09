@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Авторизация",
-  description:
-    "- Я просил купить специальный малярный скотч !- Ой, как будто малярам не все равно что пить...",
+  title: "Decision App | Авторизация",
 };
 
 export default function AuthLayout({

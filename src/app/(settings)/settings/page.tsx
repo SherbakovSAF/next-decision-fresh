@@ -1,7 +1,5 @@
 import { getCurrentUserService } from "@/services/user.service";
 import { UserMinDTO_I } from "@/types/user.types";
-import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import SettingsClient from "./(settings-content-client)/settings-client";
 
 const SettingsPage = async () => {
@@ -9,15 +7,10 @@ const SettingsPage = async () => {
 
   try {
     user = await getCurrentUserService();
+    return <SettingsClient initialUser={user} />;
   } catch {
-    redirect("/");
+    return <div>Ошибка. Next калл</div>;
   }
-
-  return (
-    <Suspense fallback={<div>Грузим твои данные</div>}>
-      <SettingsClient initialUser={user} />
-    </Suspense>
-  );
 };
 
 export default SettingsPage;

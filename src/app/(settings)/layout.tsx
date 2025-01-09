@@ -3,9 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Настройки",
-  description:
-    "- Я просил купить специальный малярный скотч !- Ой, как будто малярам не все равно что пить...",
+  title: "Decision App | Настройки",
 };
 
 export default function SettingsLayout({
@@ -13,6 +11,7 @@ export default function SettingsLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("Зашли в layout");
   return (
     <div className="py-10 h-dvh">
       <header className="mb-10">

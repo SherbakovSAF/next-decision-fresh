@@ -12,12 +12,13 @@ export const middleware = async (request: NextRequest) => {
 
   if (token && request.nextUrl.pathname.startsWith(RoutePath_E.AUTH))
     return NextResponse.rewrite(new URL(RoutePath_E.NOT_FOUND, request.url));
-  console.log("Прошли проверку токена и начала");
+
   // Доп проверка, чтобы избежать множества переадресаций
   if (request.nextUrl.pathname.startsWith(RoutePath_E.AUTH))
     return NextResponse.next();
 
   // Если просто есть токен и идёт на не Auth, то добро пожаловать
+
   if (token) return NextResponse.next();
 
   // Если же токена нет, то смотрим, есть ли refresh
